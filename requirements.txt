@@ -19,7 +19,6 @@ lxml==5.2.1
 MarkupSafe==2.1.5
 multitasking==0.0.11
 nest-asyncio==1.6.0
-numpy==1.24.4
 packaging==24.0
 pandas==2.0.3
 peewee==3.17.5
