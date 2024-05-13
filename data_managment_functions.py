@@ -8,7 +8,7 @@ import plotly.express as px
 import pandas as pd
 from datetime import date
 import plotly.graph_objects as go
-
+import json
 ''' 
 dni_w_pozycji = 20
 #ticker =  "GC=F"
@@ -194,6 +194,61 @@ def fig_cumulative(nazwa_instrumentu, t):
     elif t == 30:
         fig = fig_cumulative_30(nazwa_instrumentu)
     return fig
+
+def open_kolejne_lata_convert_and_sort(nazwa_instrumentu):
+    with open("listadniwroku.txt", "r") as grilled_cheese:
+	    lines = grilled_cheese.readlines()
+
+
+    lista_dni_w_roku = []
+    for line in lines:
+        line = line.strip()
+        lista_dni_w_roku.append(line)
+
+    f = open(f'{nazwa_instrumentu}.json')
+
+    data = json.load(f)
+
+    data_list = []
+    for key in data:
+        data_list.append({key:data[key]})
+
+    j_data = {'year':data_list}
+    dict_do_df = {}
+    df = pd.read_json(f'{nazwa_instrumentu}.json',convert_dates=False,convert_axes=False,)
+    df = df.iloc[: , 1:]
+    #df = pd.json_normalize(data)
+    lista_roku= []
+
+    dict = df.to_dict()
+
+    new_dict_sorted = {}
+    #print(df)
+    for key in dict:
+
+        d = sorted(dict[key].items(), key=lambda pair: lista_dni_w_roku.index(pair[0]))
+        dictionary = {}
+        for key_2, val in d:
+            dictionary.setdefault(key_2, val)
+        new_dict_sorted[key] = dictionary
+        #print(dictionary)
+        #print(d)
+    print(new_dict_sorted)
+    with open(f"{nazwa_instrumentu}_sorted_years.json", "w") as outfile:
+        json.dump(new_dict_sorted, outfile)
+
+    df = pd.read_json(f'{nazwa_instrumentu}_sorted_years.json',convert_dates=False,convert_axes=False,)
+
+    #fig = px.line(x=lista_dni_w_roku, y=lista_dni_w_roku)
+    #fig.show()
+
+    return
+
+def open_kolejne_lata_posortowane_json(nazwa_instrumentu):
+    df = pd.read_json(f'{nazwa_instrumentu}_sorted_years.json',convert_dates=False,convert_axes=False,)
+    print(df)
+    df.to_csv(f'{nazwa_instrumentu}_kolejnelata_sorted.csv')
+
 #akyualizuj_cumulative_30('ZLOTO')
 #aaaaaa = fig_cumulative_30('ZLOTO')
 #aaaaaa.show()
@@ -209,3 +264,13 @@ fig_probability_20('GOLD').show()
 '''
 
 #fig_cumulative_10('Gold').show()
+
+
+
+# To Są Nawe Funkcje Pod Wykres Kolejnych Lat Do Porównania
+# Prszetestuje funkcję open_kolejne_lata_convert_and_sort(nazwa_instrumentu) pętlą poprzez instrumenty
+# zmiana nazwy aby było wiadomo że jest to funkcja aktualizacji
+#open_kolejne_lata_convert_and_sort('ZLOTO')
+#open_kolejne_lata_posortowane_json('ZLOTO')
+
+

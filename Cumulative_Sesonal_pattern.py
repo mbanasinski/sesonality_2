@@ -49,6 +49,7 @@ def wykres_cumulatice_sesonal_pattern_Yachoo(ticker, start_date, nazwa_instrumen
 
     dzien_roku = list_of_days(btc_price)
 
+
     def list_of_days_in_year(df_of_prices):
         lista_dni_w_roku_b = []
         for index, row in df_of_prices.iterrows():
@@ -74,6 +75,7 @@ def wykres_cumulatice_sesonal_pattern_Yachoo(ticker, start_date, nazwa_instrumen
 
     btc_price = addig_dates_of_days_to_df(btc_price, dzien_roku)
 
+
     def dictionary_of_dares(lista_dni_w_roku):
         dict_list_dni = {}
         for d in lista_dni_w_roku:
@@ -82,6 +84,7 @@ def wykres_cumulatice_sesonal_pattern_Yachoo(ticker, start_date, nazwa_instrumen
         return dict_list_dni
 
     dict_list_dni = dictionary_of_dares(lista_dni_w_roku)
+
 
     ###################################################################
     #  TU ZACZYNA SIĘ CEŚĆ SPECYFICZNA
@@ -96,6 +99,7 @@ def wykres_cumulatice_sesonal_pattern_Yachoo(ticker, start_date, nazwa_instrumen
 
     lista_lat = []
 
+
     for r in lista_lat_b:
         if r not in lista_lat:
             lista_lat.append(r)
@@ -105,12 +109,16 @@ def wykres_cumulatice_sesonal_pattern_Yachoo(ticker, start_date, nazwa_instrumen
     for nazwa in lista_lat:
         dic_rok.update({nazwa : {}})
     #print(btc_price)
-    lista_lat
+
+    print(lista_lat)
+
     #print(lista_lat)
     for rok in dic_rok:
         for index, row in btc_price.iterrows():
             if int(row[7]) == rok:
                 dic_rok[rok].update({row[6] : row[3]})
+
+    print(dic_rok)
 
 
     for lato in lista_lat:
@@ -150,7 +158,6 @@ def wykres_cumulatice_sesonal_pattern_Yachoo(ticker, start_date, nazwa_instrumen
 
 
 
-
     dict_sredia_cum = {}
     for dzien in lista_dni_w_roku:
         lista = []
@@ -163,8 +170,14 @@ def wykres_cumulatice_sesonal_pattern_Yachoo(ticker, start_date, nazwa_instrumen
 
         dict_sredia_cum.update({ dzien: srednia})
 
+    print(dict_sredia_cum) # tu sa notowania karzdego roku po kolei
 
     dict_sredia_cum_string = {}
+    import json
+    dic_rok_do_zapisu = dic_rok
+
+    with open(f"{nazwa_instrumentu}.json", "w") as outfile:
+        json.dump(dic_rok_do_zapisu, outfile)
 
     for qqq in dict_sredia_cum:
         a = str(qqq)
@@ -526,7 +539,7 @@ def wykres_cumulatice_sesonal_pattern_Stooq(ticker, start_date):
     return tabela_procentowa
 
 
-#fig = wykres_cumulatice_sesonal_pattern_Yachoo(ticker, start_date, 'ZLOTO')
+#fig = wykres_cumulatice_sesonal_pattern_Yachoo("GC=F", "1990-01-01", 'ZLOTO')
 #print(type(fig))
 #fig.show()
 
