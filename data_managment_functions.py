@@ -154,6 +154,7 @@ def actualize():
         print(key, 'corresponds to', dic_of_tickers[key])
         try:
             akyualizuj_cumulative_30(key)
+            akyualizuj_kejlejne_lata(key)
             akyualizuj_cumulative_10(key)
             akyualizuj_probability_20(key)
             akyualizuj_probability_60(key)
@@ -248,6 +249,20 @@ def open_kolejne_lata_posortowane_json(nazwa_instrumentu):
     df = pd.read_json(f'{nazwa_instrumentu}_sorted_years.json',convert_dates=False,convert_axes=False,)
     print(df)
     df.to_csv(f'{nazwa_instrumentu}_kolejnelata_sorted.csv')
+    fig = px.line(df)
+    #fig.show()
+    return fig
+
+
+def akyualizuj_kejlejne_lata(nazwa_instrumentu):
+    tiker = dic_of_tickers[nazwa_instrumentu]
+    #akyualizuj_cumulative_30(nazwa_instrumentu)
+    try:
+        open_kolejne_lata_convert_and_sort(nazwa_instrumentu)
+    except:
+        pass
+
+
 
 #akyualizuj_cumulative_30('ZLOTO')
 #aaaaaa = fig_cumulative_30('ZLOTO')
@@ -271,6 +286,5 @@ fig_probability_20('GOLD').show()
 # Prszetestuje funkcję open_kolejne_lata_convert_and_sort(nazwa_instrumentu) pętlą poprzez instrumenty
 # zmiana nazwy aby było wiadomo że jest to funkcja aktualizacji
 #open_kolejne_lata_convert_and_sort('ZLOTO')
-#open_kolejne_lata_posortowane_json('ZLOTO')
 
 

@@ -14,11 +14,11 @@ from dash.dependencies import Output, Input
 # PARAMETRY DO PROGRAMU
 #####################################################################
 
-''' 
-dni_w_pozycji = 20
-ticker =  "ZW=F"
+
+dni_w_pozycji = 60
+ticker =  "GC=F"
 start_date = "2003-01-01"
-'''
+
 ############################################################
 
 
@@ -31,6 +31,8 @@ def wykres_probability_Yahoo(ticker, start_date, days_in_position):
         return df_of_prices
 
     btc_price = Donwland_Data_Fron_Yahoo_probability(ticker, start_date)
+    print(btc_price)
+    btc_price.to_csv('zloto_test_min.csv')
 
     def List_Of_returnes_probability(df_of_prices, days_in_position):
         List_Of_returnes = []
@@ -45,6 +47,90 @@ def wykres_probability_Yahoo(ticker, start_date, days_in_position):
         return List_Of_returnes
 
     zwrory = List_Of_returnes_probability(btc_price, days_in_position)
+
+
+
+    def min_max(df_of_prices):
+        list_of_max_values = []
+        i = 0
+        koniec_pozycji = i + (days_in_position - 1)
+        lista_słowników_pozycji_60 = []
+        #print(df_of_prices.to_dict())
+
+        for index, row in df_of_prices.iterrows():
+            słownik_dnia = row.to_dict()
+            słownik_dnia['data'] = str(index)
+            lista_słowników_pozycji_60.append(słownik_dnia)
+
+        for dict in lista_słowników_pozycji_60:
+            #print(dict)
+            zwrot = (lista_słowników_pozycji_60[i + (days_in_position - 1)]['Close']  -  lista_słowników_pozycji_60[i]['Open']) / lista_słowników_pozycji_60[i]['Open']
+            wynik_pozyji = zwrot
+            dict['wynik_pozyji'] = wynik_pozyji
+            lista_słowników_trwana_pozucji = lista_słowników_pozycji_60[i:i + days_in_position]
+            lista_low = []
+            lista_High = []
+            for dzien in lista_słowników_trwana_pozucji:
+                #print(dzien)
+                lista_low.append(dzien['Low'])
+                lista_High.append(dzien['High'])
+
+
+            cena_minimalna = min(lista_low)
+            cena_maksymalna = max(lista_High)
+            dict['cena_minimalna'] = cena_minimalna
+            dict['cena_maksymalna'] = cena_maksymalna
+            minimum_procentowe = ( dict['cena_minimalna'] - dict['Open'])/ dict['Open']
+            maxsimum_procentowe = ( dict['cena_maksymalna'] - dict['Open'])/ dict['Open']
+            #print('min_procentowe',minimum_procentowe)
+            #print(cena_minimalna)
+            #print('max_procentowe',maxsimum_procentowe)
+            dict['minimum_procentowe'] = minimum_procentowe
+            dict['maxsimum_procentowe'] = maxsimum_procentowe
+            #print(dict)
+
+            i = i +1
+            if i == (len(lista_słowników_pozycji_60) - days_in_position ):
+                break
+
+        def lista_dni_w_roku(df_of_prices):
+            dzien_roku = []
+            lista_dni_w_roku = []
+            for index, row in df_of_prices.iterrows():
+                data = str(index)
+                data.count('0')
+                data = data.replace(' 00:00:00', '')
+                data = data.split("-", 1)[1]
+                data = float(data.replace('-', '.'))
+                if data not in lista_dni_w_roku:
+                    lista_dni_w_roku.append(data)
+            return lista_dni_w_roku
+
+        lista_dni_w_roku = lista_dni_w_roku(df_of_prices)
+
+        for dzien in lista_dni_w_roku:
+
+            for dict in lista_słowników_pozycji_60:
+                data = dict['data']
+
+                data.count('0')
+                data = data.replace(' 00:00:00', '')
+                data = data.split("-", 1)[1]
+                data = float(data.replace('-', '.'))
+########################################################################################
+                # Tworzenie struktury danych pod histogram Pozycji
+                if data == dzien:
+                    print(dzien,data)
+
+
+
+
+
+
+        return
+
+    min_max(btc_price)
+
 
     def cut_df_to_shape_of_returnes_probability(df_of_prices, days_in_position):
         for i in range(days_in_position):
@@ -364,7 +450,7 @@ def wykres_probability_Stooq(ticker, start_date, days_in_position):
     return aaa
 
 
-#aaa = wykres_probability_Yahoo(ticker, start_date, dni_w_pozycji)
-#aaa.show()
+aaa = wykres_probability_Yahoo(ticker, start_date, dni_w_pozycji)
+print(aaa)
 
 

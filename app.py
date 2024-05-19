@@ -34,6 +34,7 @@ app.layout = html.Div([
     )    ,
     html.Div(
             children=html.Div([
+            html.Div(dcc.Graph(figure=data_managment.open_kolejne_lata_posortowane_json(instrument) )),
             html.Div(dcc.Graph(figure=data_managment.fig_cumulative_30(instrument) )),
             html.Div(dcc.Graph(figure=data_managment.fig_cumulative_10(instrument)), id='aaa' ),
             html.Div(dcc.Graph(figure=data_managment.fig_probability_20(instrument))),
@@ -61,6 +62,7 @@ app.layout = html.Div([
 
 def update_charts(value):
     children =html.Div([
+            html.Div(dcc.Graph(figure=data_managment.open_kolejne_lata_posortowane_json(str(value)))),
             html.Div(dcc.Graph(figure=data_managment.fig_cumulative_30(str(value)))),
             html.Div(dcc.Graph(figure=data_managment.fig_cumulative_10(str(value)))),
             html.Div(dcc.Graph(figure=data_managment.fig_probability_20(str(value)))),
