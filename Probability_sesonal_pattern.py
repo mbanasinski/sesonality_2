@@ -9,11 +9,13 @@ import dash
 from dash import dcc
 from dash import html
 from dash.dependencies import Output, Input
+import json
 
 #####################################################################
 # PARAMETRY DO PROGRAMU
 #####################################################################
 
+dic_of_tickers = {"Gold":"GC=F","Silver":"SI=F", "Palladium":"PA=F", "Platinum":"PL=F", "Copper":"HG=F", "Aluminum":"ALI=F", "Crude Oil":"CL=F", "Heating Oil":"HO=F", "Natural Gas":"NG=F", "Gasoline":"RB=F", "Corn":"ZC=F", "Oat":"ZO=F", "Wheat":"KE=F", "Soybean":"ZS=F", "Soybean Oil":"ZL=F", "Cocoa":"CC=F", "Coffee":"KC=F", "Cotton":"CT=F", "Lumber":"LBS=F", "Sugar":"SB=F", "10-Year T-Note":"ZN=F", "S&P 500":"^GSPC", "Nikkei 225":"^N225", "Dow Jones":"^DJI", "Apple Inc":"AAPL", "Tesla":"TSLA", "Amazon":"AMZN", "American Airlines":"AAL", "Alphabet(Google)":"GOOGL", "Bitcoin USD":"BTC-USD", "EURUSD":"EURUSD=X", "USDJPY":"JPY=X", "GBPUSD":"GBPUSD=X", "AUDUSD":"AUDUSD=X", "NZDUSD":"NZDUSD=X", "EURJPY":"EURJPY=X", "GBPJPY":"GBPJPY=X", "EURGBP":"EURGBP=X", "EURCAD":"EURCAD=X", "EURSEK":"EURSEK=X", "EURCHF":"EURCHF=X", "EURHUF":"EURHUF=X", "EURJPY":"EURJPY=X", "USDHKD":"HKD=X", "USDSGD":"SGD=X", "USDINR":"INR=X", "USDRUB":"RUB=X", "EURCAD":"EURCAD=X", "CADCHF":"CADCHF=X", "CADJPY":"CADJPY=X", "CHFJPY":"CHFJPY=X", "GBPCAD":"GBPCAD=X", "GBPCHF":"GBPCHF=X", "AUDCAD":"AUDCAD=X", "AUDCHF":"AUDCHF=X", "AUDJPY":"AUDJPY=X", "AUDNZD":"AUDNZD=X", "CHFPLN":"CHFPLN=X", "EURNOK":"EURNOK=X", "EURNZD":"EURNZD=X", "EURPLN":"EURPLN=X", "EURSEK":"EURSEK=X", "GBPAUD":"GBPAUD=X", "GBPNZD":"GBPNZD=X", "GBPPLN":"GBPPLN=X", "NZDJPY":"NZDJPY=X", "USDNOK":"NOK=X", "USDPLN":"PLN=X"}
 
 dni_w_pozycji = 60
 ticker =  "GC=F"
@@ -52,6 +54,7 @@ def wykres_probability_Yahoo(ticker, start_date, days_in_position):
 
     def min_max(df_of_prices):
         list_of_max_values = []
+        lista_słowników_pozycji_60_skrocona = []
         i = 0
         koniec_pozycji = i + (days_in_position - 1)
         lista_słowników_pozycji_60 = []
@@ -88,6 +91,7 @@ def wykres_probability_Yahoo(ticker, start_date, days_in_position):
             dict['minimum_procentowe'] = minimum_procentowe
             dict['maxsimum_procentowe'] = maxsimum_procentowe
             #print(dict)
+            lista_słowników_pozycji_60_skrocona.append(dict)
 
             i = i +1
             if i == (len(lista_słowników_pozycji_60) - days_in_position ):
@@ -108,19 +112,68 @@ def wykres_probability_Yahoo(ticker, start_date, days_in_position):
 
         lista_dni_w_roku = lista_dni_w_roku(df_of_prices)
 
-        for dzien in lista_dni_w_roku:
+        slownik_histogramu_pozycji = {
 
-            for dict in lista_słowników_pozycji_60:
+        }
+
+        lista_wszystkich_lat = []
+        for dzien in lista_dni_w_roku:
+            slownik_pozycji_dla_dnia = {}
+            lista_lat = []
+            lista_min = []
+            lista_max = []
+            lista_wyniku = []
+            lista_słowników_pozycji = []
+            for dict in lista_słowników_pozycji_60_skrocona:
+
                 data = dict['data']
+                #print(data)
 
                 data.count('0')
                 data = data.replace(' 00:00:00', '')
+                rok = data.split("-", 1)[0]
+                #print(rok)
+                if rok not in lista_wszystkich_lat:
+                    lista_wszystkich_lat.append(rok)
                 data = data.split("-", 1)[1]
                 data = float(data.replace('-', '.'))
 ########################################################################################
                 # Tworzenie struktury danych pod histogram Pozycji
                 if data == dzien:
-                    print(dzien,data)
+                    #print(dzien,data)
+                    lista_lat.append(rok)
+                    lista_max.append(dict['maxsimum_procentowe'])
+                    lista_min.append(dict['minimum_procentowe'])
+                    lista_wyniku.append(dict['wynik_pozyji'])
+                    pozycja_dict = {
+                        'rok':rok,
+                        'maxsimum_procentowe':dict['maxsimum_procentowe'],
+                        'minimum_procentowe':dict['minimum_procentowe'],
+                        'wynik_pozyji':dict['wynik_pozyji'],
+                    }
+                    lista_słowników_pozycji.append(pozycja_dict)
+
+                slownik_pozycji_dla_dnia['lista_lat'] = lista_lat
+                slownik_pozycji_dla_dnia['lista_min'] = lista_min
+                slownik_pozycji_dla_dnia['lista_max'] = lista_max
+                slownik_pozycji_dla_dnia['lista_wyniku'] = lista_wyniku
+                slownik_pozycji_dla_dnia['lista_słowników_pozycji'] = lista_słowników_pozycji
+                print(slownik_pozycji_dla_dnia)
+                slownik_histogramu_pozycji[dzien] = slownik_pozycji_dla_dnia
+
+                instrument = None
+
+                for instrument_name in dic_of_tickers:
+                    if dic_of_tickers[instrument_name] == ticker:
+                        instrument = instrument_name
+
+        slownik_histogramu_pozycji['lista_wszystkich_lat'] = lista_wszystkich_lat
+        slownik_histogramu_pozycji['lista_dni_w_roku'] = lista_dni_w_roku
+
+        with open(f"{instrument}_hisrofram_pozycji_{days_in_position}.json", "w") as outfile:
+            json.dump(slownik_histogramu_pozycji, outfile)
+
+
 
 
 
