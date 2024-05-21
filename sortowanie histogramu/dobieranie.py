@@ -59,8 +59,8 @@ for dzien in lista_dni_w_roku:
     for dict in dobrana_lista_slownikow_pozycji:
         print(dict)
         l_lat.append(dict['rok'])
-        l_min.append(dict['maxsimum_procentowe'])
-        l_max.append(dict['minimum_procentowe'])
+        l_min.append(dict['minimum_procentowe'])
+        l_max.append(dict['maxsimum_procentowe'])
         l_wynik.append(dict['wynik_pozyji'])
 
     print(l_lat)
