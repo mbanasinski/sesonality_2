@@ -79,3 +79,16 @@ for dzien in lista_dni_w_roku:
 
 with open(f"dobrany_histogram.json", "w") as outfile:
     json.dump(slownik_dni_dobranych_pozycji, outfile)
+
+slownik_dni = {}
+marks_d = {}
+i = 0
+for d in lista_dni_w_roku:
+    dd = str(d).split('.')[1]
+    if dd == '01':
+        marks_d[i] = d
+    slownik_dni[i] = d
+    i = i + 1
+
+#print(marks_d)
+

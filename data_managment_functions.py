@@ -22,7 +22,7 @@ dic_of_tickers = {"Gold":"GC=F","Silver":"SI=F", "Palladium":"PA=F", "Platinum":
 list_of_instruments = []
 
 for key in dic_of_tickers:
-    print(key)
+    #print(key)
     aaa = key
     key = {}
     key.update({"label": aaa})
@@ -82,6 +82,7 @@ def fig_cumulative_10(nazwa_instrumentu):
     tabela_procentowa =  open_df_cumulative_10(nazwa_instrumentu)
     x = dzis()
     #tabela_procentowa.plot(x ='Date', y='Sesonal Patern', kind = 'line')
+
     fig = px.line(tabela_procentowa, x='Date', y='Sesonal Patern' ,title='SESONAL PATTERN last 10 years'+' '+nazwa_instrumentu)
     fig.add_shape(go.layout.Shape(type="line",yref="paper", xref="x"),x0=x,y0=0, x1=x, y1=1,)
     #print(tabela_procentowa)
@@ -99,8 +100,11 @@ def open_df_probability_20(nazwa_instrumentu):
     return tabela_procentowa
 
 def fig_probability_20(nazwa_instrumentu):
-    tabela_procentowa =  open_df_probability_20(nazwa_instrumentu)
-    fig = px.line(tabela_procentowa, x='Date', y='%_PROBABILITY' ,title='HISTORICAL PROBABILITY OF WINNING 20 TRADING DAYS POSITION '+' '+nazwa_instrumentu)
+    #tabela_procentowa =  open_df_probability_20(nazwa_instrumentu)
+    #fig = px.line(tabela_procentowa, x='Date', y='%_PROBABILITY' ,title='HISTORICAL PROBABILITY OF WINNING 20 TRADING DAYS POSITION '+' '+nazwa_instrumentu)
+    #_probability_dobierane_20.pkl
+    tabela_procentowa =  pd.read_pickle(nazwa_instrumentu+"_probability_dobierane_20.pkl")
+    fig = px.line(tabela_procentowa,x='day', y='probability', title='HISTORICAL PROBABILITY OF WINNING 20 TRADING DAYS POSITION '+' '+nazwa_instrumentu)
     x = dzis()
     fig.add_shape(go.layout.Shape(type="line",yref="paper", xref="x"),x0=x,y0=0, x1=x, y1=1,)
     #print(tabela_procentowa)
@@ -118,8 +122,11 @@ def open_df_probability_60(nazwa_instrumentu):
     return tabela_procentowa
 
 def fig_probability_60(nazwa_instrumentu):
-    tabela_procentowa =  open_df_probability_60(nazwa_instrumentu)
-    fig = px.line(tabela_procentowa, x='Date', y='%_PROBABILITY' ,title='HISTORICAL PROBABILITY OF WINNING 60 TRADING DAYS POSITION '+' '+nazwa_instrumentu)
+    #tabela_procentowa =  open_df_probability_60(nazwa_instrumentu)
+    #fig = px.line(tabela_procentowa, x='Date', y='%_PROBABILITY' ,title='HISTORICAL PROBABILITY OF WINNING 60 TRADING DAYS POSITION '+' '+nazwa_instrumentu)
+
+    tabela_procentowa =  pd.read_pickle(nazwa_instrumentu+"_probability_dobierane_60.pkl")
+    fig = px.line(tabela_procentowa,x='day', y='probability', title='HISTORICAL PROBABILITY OF WINNING 20 TRADING DAYS POSITION '+' '+nazwa_instrumentu)
     x = dzis()
     fig.add_shape(go.layout.Shape(type="line",yref="paper", xref="x"),x0=x,y0=0, x1=x, y1=1,)
     #print(tabela_procentowa)
@@ -288,3 +295,5 @@ fig_probability_20('GOLD').show()
 #open_kolejne_lata_convert_and_sort('ZLOTO')
 
 
+#fig =fig_probability_20('Gold')
+#fig.show()

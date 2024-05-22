@@ -180,15 +180,16 @@ def wykres_probability_Yahoo(ticker, start_date, days_in_position):
 
         lista_dni_w_roku = data['lista_dni_w_roku']
         lista_lat = data['lista_wszystkich_lat']
-
+        l_prawdobodobienstwa = []
         lista_dni_w_roku.sort()
         slownik_dni_dobranych_pozycji = {}
         i = 0
         for dzien in lista_dni_w_roku:
             dobrany_słownik_dnia = {}
-            print('dzień',dzien)
+            #print('dzień',dzien)
             slownik_dnia = data[str(dzien)]
-            print(type(dzien))
+
+            #print(type(dzien))
             lista_słowników_pozycji = slownik_dnia['lista_słowników_pozycji']
             slowniik_slownikow_pozycji = {}
             lista_lat_na_ten_dzien = []
@@ -202,7 +203,7 @@ def wykres_probability_Yahoo(ticker, start_date, days_in_position):
                     #print(rok,slowniik_slownikow_pozycji[str(rok)])
                     dobrana_lista_slownikow_pozycji.append(slowniik_slownikow_pozycji[str(rok)])
                 else:
-                    print(rok,'Wymyślam jak dobrać rok')
+                    #print(rok,'Wymyślam jak dobrać rok')
                     for d in lista_dni_w_roku[i+1:]:
                         #print(d)
                         mam_math = False
@@ -214,11 +215,11 @@ def wykres_probability_Yahoo(ticker, start_date, days_in_position):
                             slownik_slownikow_pozycji_d[r['rok']] = r
                         #print(lista_r_in_d)
                         if rok in lista_r_in_d:
-                            print('mam dobry dzień')
+                            #print('mam dobry dzień')
                             slownik_z_pozycja_dobieraną = slownik_slownikow_pozycji_d[rok]
                             slownik_z_pozycja_dobieraną['d'] = d
 
-                            print(slownik_z_pozycja_dobieraną)
+                            #print(slownik_z_pozycja_dobieraną)
                             dobrana_lista_slownikow_pozycji.append(slownik_z_pozycja_dobieraną)
 
                             break
@@ -229,25 +230,58 @@ def wykres_probability_Yahoo(ticker, start_date, days_in_position):
             l_min = []
             l_max = []
             l_wynik = []
+            prawdopodobienstwo = None
+            up = 0
+            down = 0
+            ilosc_pozucji = len(dobrana_lista_slownikow_pozycji)
             for dict in dobrana_lista_slownikow_pozycji:
                 print(dict)
                 l_lat.append(dict['rok'])
                 l_min.append(dict['minimum_procentowe'])
                 l_max.append(dict['maxsimum_procentowe'])
                 l_wynik.append(dict['wynik_pozyji'])
+                wynik_pozyji = dict['wynik_pozyji']
+                if wynik_pozyji > 0:
+                    up = up + 1
+                else:
+                    down = down + 1
 
-            print(l_lat)
-            print(l_min)
-            print(l_max)
-            print(l_wynik)
+            prawdopodobienstwo = (up / ilosc_pozucji ) *100
+
+
+            l_prawdobodobienstwa.append(prawdopodobienstwo)
+
+            #print(l_lat)
+            #print(l_min)
+            #print(l_max)
+            #print(l_wynik)
             dobrany_słownik_dnia['lista_lat'] = l_lat
             dobrany_słownik_dnia['lista_min'] = l_min
             dobrany_słownik_dnia['lista_max'] = l_max
             dobrany_słownik_dnia['lista_wyniku'] = l_wynik
             dobrany_słownik_dnia['lista_słowników_pozycji'] = dobrana_lista_slownikow_pozycji
+            dobrany_słownik_dnia['prawdopodobienstwo'] = prawdopodobienstwo
             slownik_dni_dobranych_pozycji[dzien] = dobrany_słownik_dnia
 
             i = i + 1
+        string_lista_dni_w_roku = []
+        for d in lista_dni_w_roku:
+            dzien = str(d)
+            string_lista_dni_w_roku.append(dzien)
+        slownik_dni_dobranych_pozycji['lista_prawdobodobienstwa'] = l_prawdobodobienstwa
+        slownik_dni_dobranych_pozycji['lista_dni_w_roku'] = string_lista_dni_w_roku
+        slownik_dni_dobranych_pozycji['lista_lat'] = lista_lat
+        print('#####################################################################################################################3')
+        print(string_lista_dni_w_roku)
+
+
+        dict_do_df = {'day': string_lista_dni_w_roku, 'probability': l_prawdobodobienstwa}
+        df = pd.DataFrame(dict_do_df)
+        print(df)
+        df.to_pickle(instrument+"_probability_dobierane_"+str(days_in_position) +".pkl")
+
+        #fig = px.line(x=string_lista_dni_w_roku, y=l_prawdobodobienstwa, title='HISTORICAL PROBABILITY OF WINNING 20 TRADING DAYS POSITION '+' '+instrument)
+        #fig.show()
 
 
         with open(f"{instrument}_hisrofram_pozycji_{days_in_position}_dobierany.json", "w") as outfile:
@@ -582,7 +616,7 @@ def wykres_probability_Stooq(ticker, start_date, days_in_position):
     return aaa
 
 
-aaa = wykres_probability_Yahoo(ticker, start_date, dni_w_pozycji)
-print(aaa)
+#aaa = wykres_probability_Yahoo(ticker, start_date, dni_w_pozycji)
+#print(aaa)
 
 
